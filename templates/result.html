@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Investment Plan | Rain</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #FAFAFA;
+            color: #1D1D1F;
+            line-height: 1.5;
+            letter-spacing: -0.015em;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        /* Dark mode styles */
+        body.dark-mode {
+            background-color: #1D1D1F;
+            color: #F5F5F7;
+        }
+        
+        body.dark-mode .navbar {
+            background-color: rgba(45, 45, 45, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        body.dark-mode .card {
+            background-color: #2D2D2D;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+        }
+        
+        body.dark-mode .summary-card {
+            background: linear-gradient(180deg, #2D2D2D 0%, #1D1D1F 100%);
+        }
+        
+        body.dark-mode .chart-tab {
+            background-color: #3D3D3D;
+            color: #F5F5F7;
+        }
+        
+        body.dark-mode .chart-tab.active {
+            background-color: #007AFF;
+        }
+        
+        body.dark-mode .insight-card {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        body.dark-mode .insight-card:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+        
+        body.dark-mode footer {
+            background-color: #1D1D1F;
+            color: #86868B;
+        }
+        
+        body.dark-mode .btn-primary {
+            background-color: #007AFF;
+        }
+        
+        body.dark-mode .summary-label,
+        body.dark-mode .sector-amount {
+            color: #AAAAAA;
+        }
+        
+        /* Theme toggle button */
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            color: inherit;
+            font-size: 0.9rem;
+            transition: opacity 0.3s;
+        }
+        
+        .theme-toggle:hover {
+            opacity: 0.8;
+        }
+        
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 6px;
+        }
+        
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 16px 0;
+        }
+        
+        .navbar-brand {
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        
+        .header-section {
+            padding: 80px 0 40px;
+            background-color: #FFFFFF;
+        }
+        
+        h1, h2, h3, h4 {
+            font-weight: 600;
+            letter-spacing: -0.03em;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        .section-subtitle {
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: #86868B;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.1);
+        }
+        
+        .summary-card {
+            background: linear-gradient(180deg, #FFFFFF 0%, #F5F5F7 100%);
+            padding: 32px;
+        }
+        
+        .summary-value {
+            font-size: 2rem;
+            font-weight: 600;
+            margin: 8px 0;
+        }
+        
+        .summary-label {
+            font-size: 0.9rem;
+            color: #86868B;
+            font-weight: 500;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+            color: #1D1D1F;
+        }
+        
+        .allocation-bar {
+            height: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .allocation-segment {
+            height: 100%;
+            float: left;
+            position: relative;
+            transition: width 1s ease-out;
+        }
+        
+        .allocation-segment span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        
+        .sector-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .sector-item:last-child {
+            border-bottom: none;
+        }
+        
+        .sector-name {
+            display: flex;
+            align-items: center;
+        }
+        
+        .sector-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 6px;
+            margin-right: 12px;
+            display: inline-block;
+        }
+        
+        .sector-percentage {
+            font-weight: 600;
+        }
+        
+        .sector-amount {
+            color: #86868B;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background-color: #000000;
+            border: none;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #333;
+            transform: translateY(-2px);
+        }
+        
+        .insight-card {
+            background-color: rgba(0, 0, 0, 0.02);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .insight-card:hover {
+            background-color: rgba(0, 0, 0, 0.04);
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        
+        .projection-note {
+            font-size: 0.9rem;
+            color: #86868B;
+            margin-top: 16px;
+        }
+        
+        .success-text {
+            color: #34C759;
+        }
+        
+        .footer-text {
+            font-size: 0.9rem;
+        }
+        
+        .chart-tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .chart-tab {
+            padding: 8px 16px;
+            margin-right: 8px;
+            background-color: #F5F5F7;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .chart-tab.active {
+            background-color: #000;
+            color: white;
+        }
+        
+        .risk-meter {
+            height: 8px;
+            background: linear-gradient(to right, #34C759, #FF9500, #FF2D55);
+            border-radius: 4px;
+            margin: 30px 0 10px;
+            position: relative;
+        }
+        
+        .risk-indicator {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background-color: #000;
+            border-radius: 50%;
+            top: -4px;
+            transform: translateX(-50%);
+            box-shadow: 0 0 0 4px rgba(0,0,0,0.1);
+        }
+        
+        .risk-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #86868B;
+            margin-top: 5px;
+        }
+        
+        .animation-fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar sticky-top">
+        <div class="container d-flex justify-content-between">
+            <div class="d-flex align-items-center">
+                <a class="navbar-brand" href="/">Rain</a>
+                <ul class="nav ms-4 d-none d-md-flex">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/invest">Investment Calculator</a>
+                    </li>
+                </ul>
+            </div>
+            <button id="themeToggle" class="theme-toggle">
+                <svg id="lightIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <svg id="darkIcon" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+                <span id="themeText">Dark Mode</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <section class="header-section">
+        <div class="container">
+            <h1 class="section-title">Your Investment Plan</h1>
+            <p class="section-subtitle">Optimized allocation based on your preferences</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="py-5">
+        <div class="container">
+            <!-- Investment Summary -->
+            <div class="row mb-5">
+                <div class="col-lg-10 mx-auto">
+                    <div class="card summary-card">
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <div class="summary-label">Investment Amount</div>
+                                <div class="summary-value">${{ "%.2f"|format(amount) }}</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="summary-label">Expected Annual Return</div>
+                                <div class="summary-value success-text">{{ "%.1f"|format(expected_return) }}%</div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="summary-label">Projected 5-Year Value</div>
+                                <div class="summary-value">${{ "%.2f"|format(five_year_value) }}</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Risk Meter -->
+                        <div class="mt-4">
+                            <div class="text-center mb-2">
+                                <small class="text-muted">Risk Profile: <strong class="text-capitalize">{{ risk_profile }}</strong></small>
+                            </div>
+                            <div class="risk-meter">
+                                <div class="risk-indicator" style="left: {{ risk_score * 10 }}%;"></div>
+                            </div>
+                            <div class="risk-labels">
+                                <div>Conservative</div>
+                                <div>Moderate</div>
+                                <div>Aggressive</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Allocation Section -->
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title">Optimized Allocation</h3>
+                            
+                            <!-- Visual allocation bar -->
+                            <div class="allocation-bar">
+                                {% set colors = ['#007AFF', '#5856D6', '#FF2D55', '#34C759', '#FF9500', '#AF52DE'] %}
+                                {% set i = 0 %}
+                                {% for sector, percentage in allocation.items() %}
+                                    <div class="allocation-segment animation-fade-in" 
+                                         style="width: {{ percentage * 100 }}%; background-color: {{ colors[i % 6] }}; animation-delay: {{ i * 0.1 }}s;">
+                                        <span>{{ "%.0f"|format(percentage * 100) }}%</span>
+                                    </div>
+                                    {% set i = i + 1 %}
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Chart tabs -->
+                            <div class="chart-tabs">
+                                <div class="chart-tab active" data-chart="allocation">Allocation</div>
+                                <div class="chart-tab" data-chart="contribution">Return Contribution</div>
+                            </div>
+                            
+                            <!-- Chart containers -->
+                            <div class="chart-container">
+                                <canvas id="allocationChart"></canvas>
+                                <canvas id="contributionChart" style="display: none;"></canvas>
+                            </div>
+                            
+                            <!-- Allocation breakdown -->
+                            {% set i = 0 %}
+                            {% for sector, percentage in allocation.items() %}
+                                <div class="sector-item animation-fade-in" style="animation-delay: {{ (i + 3) * 0.1 }}s;">
+                                    <div class="sector-name">
+                                        <span class="sector-color" style="background-color: {{ colors[i % 6] }};"></span>
+                                        {{ sector }}
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="sector-percentage">{{ "%.1f"|format(percentage * 100) }}%</div>
+                                        <div class="sector-amount">${{ "%.2f"|format(amount * percentage) }}</div>
+                                    </div>
+                                </div>
+                                {% set i = i + 1 %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- AI Insights -->
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title">Investment Insights</h3>
+                            
+                            {% for insight in insights %}
+                                <div class="insight-card animation-fade-in" style="animation-delay: {{ loop.index * 0.15 }}s;">
+                                    <p class="mb-0">{{ insight }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Projection Chart -->
+                <div class="col-lg-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h3 class="card-title">Growth Projection</h3>
+                            <div class="d-flex justify-content-end mb-3">
+                                <div class="btn-group btn-group-sm" role="group" aria-label="Projection Views">
+                                    <button type="button" class="btn btn-outline-primary active" id="viewBasic">Basic View</button>
+                                    <button type="button" class="btn btn-outline-primary" id="viewMonteCarlo">Confidence Interval</button>
+                                    <button type="button" class="btn btn-outline-primary" id="viewScenarios">Scenarios</button>
+                                </div>
+                            </div>
+                            <div class="chart-container" style="position: relative; height:300px;">
+                                <canvas id="projectionChart"></canvas>
+                            </div>
+                            <div class="mt-3 small">
+                                <div class="text-muted mb-2">Toggle scenarios:</div>
+                                <div id="scenarioToggles" class="d-flex flex-wrap gap-2 mb-3">
+                                    <!-- Generated dynamically -->
+                                </div>
+                                <div class="mt-3 alert alert-info small" id="scenarioInfo">
+                                    <strong>Expected Growth:</strong> Shows the most likely path based on historical market data and current economic conditions.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add this new section before the Action Button -->
+            <div class="row mt-5">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title">Portfolio Simulator</h3>
+                            <p class="mb-4">Experiment with different allocations to see how they compare with our AI recommendation.</p>
+                            
+                            <div class="row">
+                                <div class="col-lg-7">
+                                    <div id="allocationSimulator">
+                                        {% set i = 0 %}
+                                        {% for sector, percentage in allocation.items() %}
+                                        <div class="mb-3">
+                                            <label class="form-label d-flex justify-content-between">
+                                                <div>
+                                                    <span class="sector-color d-inline-block me-2" style="background-color: {{ colors[i % 6] }};"></span>
+                                                    {{ sector }}
+                                                </div>
+                                                <span class="simulation-value">{{ "%.0f"|format(percentage * 100) }}%</span>
+                                            </label>
+                                            <input type="range" class="form-range allocation-slider" 
+                                                   min="0" max="100" step="1" 
+                                                   value="{{ "%.0f"|format(percentage * 100) }}"
+                                                   data-sector="{{ sector }}">
+                                        </div>
+                                        {% set i = i + 1 %}
+                                        {% endfor %}
+                                        
+                                        <div class="mt-4">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <strong>Total Allocation:</strong>
+                                                <span id="totalAllocation">100%</span>
+                                            </div>
+                                            <div class="progress" style="height: 10px;">
+                                                <div id="totalAllocationBar" class="progress-bar" role="progressbar" style="width: 100%"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mt-4">
+                                            <button id="compareButton" class="btn btn-dark">Compare with AI Recommendation</button>
+                                            <button id="resetButton" class="btn btn-outline-secondary ms-2">Reset</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-5">
+                                    <div class="card h-100 border-0 bg-light">
+                                        <div class="card-body">
+                                            <h4 class="card-title">Comparison Results</h4>
+                                            <div id="comparisonResults">
+                                                <div class="text-center py-5">
+                                                    <p class="text-muted">Adjust the sliders and click "Compare" to see how your allocation compares with our AI recommendation.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add this new section for advanced analytics -->
+            <div class="row mt-5">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title">Advanced Risk Analytics</h3>
+                            
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <h5 class="mb-3">Probability Analysis</h5>
+                                    <div class="progress mb-4" style="height: 25px;">
+                                        <div class="progress-bar bg-danger" role="progressbar" id="prob10" 
+                                             style="width: 10%;" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">
+                                            10%
+                                        </div>
+                                        <div class="progress-bar bg-warning" role="progressbar" id="prob10to50" 
+                                             style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">
+                                            40%
+                                        </div>
+                                        <div class="progress-bar bg-success" role="progressbar" id="prob50to90" 
+                                             style="width: 40%;" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">
+                                            40%
+                                        </div>
+                                        <div class="progress-bar bg-info" role="progressbar" id="prob90" 
+                                             style="width: 10%;" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">
+                                            10%
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between small text-muted mb-4">
+                                        <div>Worst Case</div>
+                                        <div>Expected</div>
+                                        <div>Best Case</div>
+                                    </div>
+                                    
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Confidence Level</th>
+                                                <th>Projected Value</th>
+                                                <th>Return</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>90% Chance of Exceeding</td>
+                                                <td id="val10"></td>
+                                                <td id="ret10"></td>
+                                            </tr>
+                                            <tr class="table-success">
+                                                <td>Expected Outcome</td>
+                                                <td id="valExpected"></td>
+                                                <td id="retExpected"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>10% Chance of Exceeding</td>
+                                                <td id="val90"></td>
+                                                <td id="ret90"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <h5 class="mb-3">Risk Metrics</h5>
+                                    
+                                    <div class="mb-4">
+                                        <label class="form-label d-flex justify-content-between">
+                                            <div>Volatility (Annual)</div>
+                                            <div id="volatilityValue">0%</div>
+                                        </label>
+                                        <div class="progress" style="height: 10px;">
+                                            <div class="progress-bar" role="progressbar" id="volatilityBar" 
+                                                 style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <div class="d-flex justify-content-between small text-muted mt-1">
+                                            <div>Low</div>
+                                            <div>Medium</div>
+                                            <div>High</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label class="form-label d-flex justify-content-between">
+                                            <div>Downside Risk</div>
+                                            <div id="downsideValue">0%</div>
+                                        </label>
+                                        <div class="progress" style="height: 10px;">
+                                            <div class="progress-bar bg-danger" role="progressbar" id="downsideBar" 
+                                                 style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <div class="d-flex justify-content-between small text-muted mt-1">
+                                            <div>Low</div>
+                                            <div>Medium</div>
+                                            <div>High</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-4">
+                                        <label class="form-label d-flex justify-content-between">
+                                            <div>Upside Potential</div>
+                                            <div id="upsideValue">0%</div>
+                                        </label>
+                                        <div class="progress" style="height: 10px;">
+                                            <div class="progress-bar bg-success" role="progressbar" id="upsideBar" 
+                                                 style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                        <div class="d-flex justify-content-between small text-muted mt-1">
+                                            <div>Low</div>
+                                            <div>Medium</div>
+                                            <div>High</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="alert alert-info small">
+                                        <i class="bi bi-info-circle-fill me-2"></i>
+                                        These metrics are calculated using <strong>{{ simulation_meta.simulated_scenarios.monte_carlo.simulations }}</strong> Monte Carlo simulations, considering market volatility, inflation effects, and potential economic scenarios.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Button -->
+            <div class="text-center mt-5">
+                <a href="/" class="btn btn-primary">Start a New Investment</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container text-center">
+            <p class="footer-text">© 2023 Rain. This is a demonstration of AI-powered investing.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Theme toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('themeToggle');
+            const themeText = document.getElementById('themeText');
+            const lightIcon = document.getElementById('lightIcon');
+            const darkIcon = document.getElementById('darkIcon');
+            
+            // Check for saved theme preference or respect OS preference
+            const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const savedTheme = localStorage.getItem('theme');
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDarkMode)) {
+                document.body.classList.add('dark-mode');
+                themeText.textContent = 'Light Mode';
+                lightIcon.style.display = 'none';
+                darkIcon.style.display = 'block';
+            }
+            
+            // Theme toggle event
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                
+                // Update button text and icon
+                themeText.textContent = isDarkMode ? 'Light Mode' : 'Dark Mode';
+                lightIcon.style.display = isDarkMode ? 'none' : 'block';
+                darkIcon.style.display = isDarkMode ? 'block' : 'none';
+                
+                // Save preference
+                localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+                
+                // Update charts for better visibility in dark mode
+                updateChartsForTheme(isDarkMode);
+            });
+        });
+        
+        // Update chart colors based on theme
+        function updateChartsForTheme(isDarkMode) {
+            // Update text color for all charts
+            Chart.defaults.color = isDarkMode ? '#F5F5F7' : '#1D1D1F';
+            
+            // Update grid lines
+            Chart.defaults.scale.grid.color = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+            
+            // Refresh all charts
+            if (window.allocationChart) allocationChart.update();
+            if (window.contributionChart) contributionChart.update();
+            if (window.projectionChart) projectionChart.update();
+            if (window.annualGrowthChart) annualGrowthChart.update();
+        }
+        
+        // Initialize all charts and visualizations
+        document.addEventListener('DOMContentLoaded', function() {
+            const chartData = {{ chart_data|safe }};
+            const portfolioData = {
+                labels: Object.keys({{ allocation|tojson }}),
+                data: Object.values({{ allocation|tojson }}).map(value => value * 100)
+            };
+            
+            const contributionData = {{ sector_contributions|safe }};
+            const simulationMeta = {{ simulation_meta|safe }};
+            
+            // Format currency
+            const formatter = new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            });
+            
+            const percentFormatter = new Intl.NumberFormat('en-US', {
+                style: 'percent',
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1
+            });
+            
+            // Initialize the allocation pie chart
+            const allocationCtx = document.getElementById('allocationChart').getContext('2d');
+            const allocationChart = new Chart(allocationCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: portfolioData.labels,
+                    datasets: [{
+                        data: portfolioData.data,
+                        backgroundColor: [
+                            '#007AFF', '#5856D6', '#FF2D55', 
+                            '#34C759', '#FF9500', '#AF52DE'
+                        ],
+                        borderWidth: 2,
+                        borderColor: document.body.classList.contains('dark-mode') ? '#2D2D2D' : '#FFFFFF'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: 'Inter, sans-serif'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    return `${label}: ${value}%`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        animateScale: true,
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+            
+            // Initialize the contribution chart
+            const contributionCtx = document.getElementById('contributionChart').getContext('2d');
+            const contributionChart = new Chart(contributionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(contributionData),
+                    datasets: [{
+                        data: Object.values(contributionData),
+                        backgroundColor: [
+                            '#007AFF', '#5856D6', '#FF2D55', 
+                            '#34C759', '#FF9500', '#AF52DE'
+                        ],
+                        borderWidth: 2,
+                        borderColor: document.body.classList.contains('dark-mode') ? '#2D2D2D' : '#FFFFFF'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: 'Inter, sans-serif'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    return `${label}: ${formatter.format(value)}`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        animateScale: true,
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+            
+            // Initialize the projection line chart
+            const projectionCtx = document.getElementById('projectionChart').getContext('2d');
+            const projectionChart = new Chart(projectionCtx, {
+                type: 'line',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: {
+                                    family: 'Inter, sans-serif'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.dataset.label || '';
+                                    const value = context.raw || 0;
+                                    return `${label}: ${formatter.format(value)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Investment Value ($)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+            
+            // Create scenario toggles
+            const scenarioToggles = document.getElementById('scenarioToggles');
+            chartData.datasets.forEach((dataset, index) => {
+                if (index > 2) { // Skip the first three datasets (main, 10th, 90th percentile)
+                    const toggleBtn = document.createElement('button');
+                    toggleBtn.className = 'btn btn-sm btn-outline-secondary';
+                    toggleBtn.textContent = dataset.label;
+                    toggleBtn.addEventListener('click', function() {
+                        // Toggle dataset visibility
+                        const isHidden = projectionChart.isDatasetHidden(index);
+                        projectionChart.setDatasetVisibility(index, isHidden);
+                        projectionChart.update();
+                        
+                        // Toggle button active state
+                        this.classList.toggle('active', !isHidden);
+                        
+                        // Update scenario info
+                        updateScenarioInfo(dataset.label);
+                    });
+                    scenarioToggles.appendChild(toggleBtn);
+                }
+            });
+            
+            // View toggle functionality
+            document.getElementById('viewBasic').addEventListener('click', function() {
+                setActiveButton(this);
+                // Show only the basic view (expected growth)
+                for (let i = 0; i < chartData.datasets.length; i++) {
+                    projectionChart.setDatasetVisibility(i, i === 0);
+                }
+                projectionChart.update();
+                updateScenarioInfo('Expected Growth');
+            });
+            
+            document.getElementById('viewMonteCarlo').addEventListener('click', function() {
+                setActiveButton(this);
+                // Show Monte Carlo simulation (expected growth + percentiles)
+                for (let i = 0; i < chartData.datasets.length; i++) {
+                    projectionChart.setDatasetVisibility(i, i <= 2);
+                }
+                projectionChart.update();
+                updateScenarioInfo('Monte Carlo Simulation');
+            });
+            
+            document.getElementById('viewScenarios').addEventListener('click', function() {
+                setActiveButton(this);
+                // Show all economic scenarios
+                for (let i = 0; i < chartData.datasets.length; i++) {
+                    projectionChart.setDatasetVisibility(i, i === 0 || i >= 3);
+                }
+                projectionChart.update();
+                updateScenarioInfo('Economic Scenarios');
+            });
+            
+            function setActiveButton(button) {
+                document.querySelectorAll('.btn-group .btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                button.classList.add('active');
+            }
+            
+            function updateScenarioInfo(scenario) {
+                const infoEl = document.getElementById('scenarioInfo');
+                let infoText = '';
+                
+                switch(scenario) {
+                    case 'Expected Growth':
+                        infoText = '<strong>Expected Growth:</strong> Shows the most likely path based on historical market data and current economic conditions.';
+                        break;
+                    case 'Monte Carlo Simulation':
+                        infoText = '<strong>Confidence Interval:</strong> Shows possible outcomes based on Monte Carlo simulations. The shaded area represents the range between the 10th and 90th percentiles.';
+                        break;
+                    case 'Economic Scenarios':
+                        infoText = '<strong>Economic Scenarios:</strong> Compare how your investment might perform under different economic conditions.';
+                        break;
+                    case 'Recession Scenario':
+                        infoText = '<strong>Recession Scenario:</strong> Models a significant economic downturn occurring during the investment period.';
+                        break;
+                    case 'Bull Market':
+                        infoText = '<strong>Bull Market:</strong> Projects performance in a strong, sustained market uptrend with growth rates 30% higher than expected.';
+                        break;
+                    default:
+                        infoText = 'Select different scenarios to see how your investment might perform under various market conditions.';
+                }
+                
+                infoEl.innerHTML = infoText;
+            }
+            
+            // Tab switching for allocation charts
+            document.querySelectorAll('.chart-tab[data-chart="allocation"], .chart-tab[data-chart="contribution"]').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Update active tab
+                    document.querySelectorAll('.chart-tab[data-chart="allocation"], .chart-tab[data-chart="contribution"]').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // Show the correct chart
+                    if (this.dataset.chart === 'allocation') {
+                        document.getElementById('allocationChart').style.display = 'block';
+                        document.getElementById('contributionChart').style.display = 'none';
+                    } else {
+                        document.getElementById('allocationChart').style.display = 'none';
+                        document.getElementById('contributionChart').style.display = 'block';
+                    }
+                });
+            });
+            
+            // Update Risk Analytics Section
+            function updateRiskAnalytics() {
+                // Get values from simulationMeta
+                const initialInvestment = simulationMeta.initial_investment;
+                const percentile10 = simulationMeta.simulated_scenarios.monte_carlo.percentiles["10"];
+                const percentile90 = simulationMeta.simulated_scenarios.monte_carlo.percentiles["90"];
+                const expectedFinal = {{ five_year_value }};
+                
+                // Calculate returns
+                const return10 = (percentile10 / initialInvestment - 1) * 100;
+                const return90 = (percentile90 / initialInvestment - 1) * 100;
+                const returnExpected = (expectedFinal / initialInvestment - 1) * 100;
+                
+                // Update values in the table
+                document.getElementById('val10').textContent = formatter.format(percentile10);
+                document.getElementById('val90').textContent = formatter.format(percentile90);
+                document.getElementById('valExpected').textContent = formatter.format(expectedFinal);
+                
+                document.getElementById('ret10').textContent = return10.toFixed(1) + '%';
+                document.getElementById('ret90').textContent = return90.toFixed(1) + '%';
+                document.getElementById('retExpected').textContent = returnExpected.toFixed(1) + '%';
+                
+                // Update risk metrics
+                const volatility = simulationMeta.risk_metrics.volatility;
+                const downside = simulationMeta.risk_metrics.downside_risk;
+                const upside = simulationMeta.risk_metrics.upside_potential;
+                
+                // Update volatility
+                document.getElementById('volatilityValue').textContent = volatility.toFixed(1) + '%';
+                const volatilityPercent = Math.min(100, volatility * 2); // Scale for display: 50% volatility would be 100% on the bar
+                document.getElementById('volatilityBar').style.width = volatilityPercent + '%';
+                
+                // Set color based on volatility level
+                if (volatility < 10) {
+                    document.getElementById('volatilityBar').className = 'progress-bar bg-success';
+                } else if (volatility < 20) {
+                    document.getElementById('volatilityBar').className = 'progress-bar bg-warning';
+                } else {
+                    document.getElementById('volatilityBar').className = 'progress-bar bg-danger';
+                }
+                
+                // Update downside
+                document.getElementById('downsideValue').textContent = downside.toFixed(1) + '%';
+                const downsidePercent = Math.min(100, downside * 2);
+                document.getElementById('downsideBar').style.width = downsidePercent + '%';
+                
+                // Update upside
+                document.getElementById('upsideValue').textContent = upside.toFixed(1) + '%';
+                const upsidePercent = Math.min(100, upside / 2);
+                document.getElementById('upsideBar').style.width = upsidePercent + '%';
+            }
+            
+            // Call the update function
+            updateRiskAnalytics();
+        });
+        
+        // Portfolio Simulator functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sliders = document.querySelectorAll('.allocation-slider');
+            const totalAllocation = document.getElementById('totalAllocation');
+            const totalAllocationBar = document.getElementById('totalAllocationBar');
+            const compareButton = document.getElementById('compareButton');
+            const resetButton = document.getElementById('resetButton');
+            const comparisonResults = document.getElementById('comparisonResults');
+            
+            // Store initial values for reset
+            const initialValues = {};
+            sliders.forEach(slider => {
+                initialValues[slider.dataset.sector] = parseInt(slider.value);
+            });
+            
+            // Update totals when sliders change
+            function updateTotal() {
+                let total = 0;
+                sliders.forEach(slider => {
+                    total += parseInt(slider.value);
+                    slider.nextElementSibling.textContent = slider.value + '%';
+                });
+                
+                totalAllocation.textContent = total + '%';
+                totalAllocationBar.style.width = Math.min(100, total) + '%';
+                
+                // Change color based on total
+                if (total === 100) {
+                    totalAllocationBar.className = 'progress-bar bg-success';
+                    compareButton.disabled = false;
+                } else if (total < 100) {
+                    totalAllocationBar.className = 'progress-bar bg-warning';
+                    compareButton.disabled = true;
+                } else {
+                    totalAllocationBar.className = 'progress-bar bg-danger';
+                    compareButton.disabled = true;
+                }
+            }
+            
+            // Initialize the display
+            sliders.forEach(slider => {
+                // Create a span to display the value
+                const valueDisplay = document.createElement('span');
+                valueDisplay.className = 'badge bg-light text-dark ms-2';
+                valueDisplay.textContent = slider.value + '%';
+                slider.parentNode.appendChild(valueDisplay);
+                
+                // Add event listener
+                slider.addEventListener('input', function() {
+                    valueDisplay.textContent = this.value + '%';
+                    updateTotal();
+                });
+            });
+            
+            // Reset to initial values
+            resetButton.addEventListener('click', function() {
+                sliders.forEach(slider => {
+                    slider.value = initialValues[slider.dataset.sector];
+                    slider.nextElementSibling.textContent = slider.value + '%';
+                });
+                updateTotal();
+                comparisonResults.innerHTML = `
+                    <div class="text-center py-5">
+                        <p class="text-muted">Adjust the sliders and click "Compare" to see how your allocation compares with our AI recommendation.</p>
+                    </div>
+                `;
+            });
+            
+            // Compare with AI recommendation
+            compareButton.addEventListener('click', async function() {
+                // Show loading state
+                comparisonResults.innerHTML = `
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3">Analyzing your portfolio...</p>
+                    </div>
+                `;
+                
+                // Gather custom allocation
+                const customAllocation = {};
+                sliders.forEach(slider => {
+                    customAllocation[slider.dataset.sector] = parseInt(slider.value);
+                });
+                
+                try {
+                    // Make API call to compare
+                    const response = await fetch('/api/compare-allocation', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            amount: {{ amount }},
+                            risk_profile: '{{ risk_profile }}',
+                            custom_allocation: customAllocation
+                        }),
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        comparisonResults.innerHTML = `
+                            <div class="alert alert-danger">
+                                ${data.error}
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    // Generate result HTML
+                    const performanceClass = data.difference >= 0 ? 'text-success' : 'text-danger';
+                    const performanceIcon = data.difference >= 0 ? '↑' : '↓';
+                    
+                    comparisonResults.innerHTML = `
+                        <div class="comparison-result animation-fade-in">
+                            <div class="d-flex justify-content-between mb-4">
+                                <div>
+                                    <p class="mb-1 text-muted">AI Recommended</p>
+                                    <h3>${data.ai_return}%</h3>
+                                </div>
+                                <div class="text-end">
+                                    <p class="mb-1 text-muted">Your Portfolio</p>
+                                    <h3>${data.custom_return}%</h3>
+                                </div>
+                            </div>
+                            
+                            <div class="alert ${data.difference >= 0 ? 'alert-success' : 'alert-warning'}">
+                                <h5 class="mb-0">
+                                    <span class="${performanceClass}">${performanceIcon} ${Math.abs(data.difference)}%</span>
+                                    ${data.difference >= 0 ? 'better than' : 'worse than'} AI recommendation
+                                </h5>
+                            </div>
+                            
+                            <p class="mt-4">${data.recommendation}</p>
+                            
+                            <div class="mt-4">
+                                <h5>Key Insights:</h5>
+                                <ul class="list-unstyled">
+                                    ${data.difference >= 0 ? 
+                                        `<li>✅ Your allocation emphasizes high-growth sectors</li>
+                                         <li>✅ Good balance between risk and potential return</li>` : 
+                                        `<li>⚠️ Consider increasing allocation to high-growth sectors</li>
+                                         <li>⚠️ Your portfolio may have suboptimal risk-return ratio</li>`
+                                    }
+                                    <li>${data.difference >= 0 ? '✅' : '⚠️'} Expected annual return: ${data.custom_return}%</li>
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                } catch (error) {
+                    comparisonResults.innerHTML = `
+                        <div class="alert alert-danger">
+                            An error occurred while analyzing your portfolio. Please try again.
+                        </div>
+                    `;
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

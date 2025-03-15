@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rain | AI-Powered Investment Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .animate-in {
+            opacity: 0;
+            animation: fadeInUp 0.6s forwards;
+        }
+        
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15);
+        }
+        
+        .hero-section {
+            background: linear-gradient(180deg, #FFFFFF 0%, #F5F5F7 100%);
+            padding: 120px 0 100px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-graphic {
+            position: absolute;
+            top: 100px;
+            right: -100px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(0, 122, 255, 0.1) 0%, rgba(0, 122, 255, 0.05) 50%, rgba(0, 122, 255, 0) 70%);
+            border-radius: 50%;
+            animation: scaleIn 1.5s ease-out;
+            z-index: 0;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            background-color: #007AFF;
+        }
+        
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            body.auto-dark-mode {
+                background-color: #1D1D1F;
+                color: #F5F5F7;
+            }
+            
+            body.auto-dark-mode .hero-section {
+                background: linear-gradient(180deg, #1D1D1F 0%, #000000 100%);
+            }
+            
+            body.auto-dark-mode .card {
+                background-color: #2D2D2D;
+                color: #F5F5F7;
+            }
+            
+            body.auto-dark-mode footer {
+                background-color: #1D1D1F;
+            }
+        }
+    </style>
+</head>
+<body class="auto-dark-mode">
+    <!-- Navbar -->
+    <nav class="navbar sticky-top">
+        <div class="container d-flex justify-content-between">
+            <div class="d-flex align-items-center">
+                <a class="navbar-brand" href="/">Rain</a>
+                <ul class="nav ms-4 d-none d-md-flex">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                </ul>
+            </div>
+            <button id="themeToggle" class="theme-toggle">
+                <svg id="lightIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <svg id="darkIcon" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+                <span id="themeText">Dark Mode</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="floating-elements" id="floatingElements"></div>
+        <div class="hero-graphic"></div>
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 hero-content">
+                    <h1 class="display-4 fw-bold animate-in" style="animation-delay: 0.1s;">AI-Powered Investment Platform</h1>
+                    <p class="lead mb-4 animate-in" style="animation-delay: 0.2s;">Rain uses AI to analyze market trends and create optimized investment portfolios tailored to your risk profile.</p>
+                    <div class="animate-in" style="animation-delay: 0.3s;">
+                        <a href="#investment-form" class="btn btn-primary btn-lg me-2">Start Investing</a>
+                        <a href="#how-it-works" class="btn btn-outline-dark btn-lg">Learn More</a>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-none d-lg-block">
+                    <!-- Empty for hero graphic -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="py-5 my-5" id="how-it-works">
+        <div class="container">
+            <h2 class="text-center mb-5">How It Works</h2>
+            
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="feature-icon mx-auto" style="background-color: #007AFF;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c0-.001-.001-.004-.004-.006a.242.242 0 0 0-.013-.016 5.146 5.146 0 0 0-.309-.374 8.361 8.361 0 0 0-1.37-1.217 8.699 8.699 0 0 0-2.304-1.101 8.706 8.706 0 0 0-2-.287 8.706 8.706 0 0 0-2 .287 8.7 8.7 0 0 0-2.304 1.101 8.306 8.306 0 0 0-1.37 1.217 5.17 5.17 0 0 0-.309.374.854.854 0 0 0-.017.023C1 9.96 1 9.997 1 10c0 .003 0 .04.001.06 0 .003.002.006.003.008l.001.003v.001h.002l.01.007.01.008c.003.004.01.01.018.016a.852.852 0 0 0 .283.212c.398.238 1.157.573 2.173.773.509.1 1.168.169 1.999.169s1.49-.069 1.999-.169c1.016-.2 1.775-.535 2.173-.773a.887.887 0 0 0 .283-.212l.018-.016.01-.008.01-.007h.002v-.001l.001-.003.003-.008c0-.02.001-.057.001-.06 0-.003 0-.04-.001-.06L14 10z"/>
+                                </svg>
+                            </div>
+                            <h4>1. Define Your Profile</h4>
+                            <p>Tell us about your investment goals and risk tolerance. We'll use this to create a personalized strategy.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="feature-icon mx-auto" style="background-color: #5856D6;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+                                    <path d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+                                </svg>
+                            </div>
+                            <h4>2. AI Analysis</h4>
+                            <p>Our algorithm processes market data, trends, and historical performance to create an optimized allocation.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="feature-icon mx-auto" style="background-color: #FF9500;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M0 2.5A1.5 1.5 0 0 1 1.5 1h11A1.5 1.5 0 0 1 14 2.5v10.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 0 13V2.5zm1.5-.5a.5.5 0 0 0-.5.5v10.5a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5V2.5a.5.5 0 0 0-.5-.5h-11z"/>
+                                    <path d="M10.854 8.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 10.793l2.646-2.647a.5.5 0 0 1 .708 0z"/>
+                                </svg>
+                            </div>
+                            <h4>3. Get Your Plan</h4>
+                            <p>Receive a detailed investment plan with projected growth and visualized data to help you make informed decisions.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <h2 class="text-center mb-5">Key Features</h2>
+            
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="mb-3">AI-Driven Allocation</h4>
+                            <p>Our platform analyzes various market factors to create an optimized allocation across different sectors.</p>
+                            <ul>
+                                <li>AI-driven sector allocation</li>
+                                <li>Personalized risk assessment</li>
+                                <li>Data-based investment decisions</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h4 class="mb-3">Interactive Visualizations</h4>
+                            <p>View your investment projections through interactive charts and visualizations.</p>
+                            <ul>
+                                <li>Detailed projections and insights</li>
+                                <li>Interactive charts with multiple views</li>
+                                <li>Portfolio comparison tools</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Investment Form Section -->
+    <section class="py-5" id="investment-form">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-body p-5">
+                            <h2 class="card-title text-center mb-4">Start Your AI-Powered Investment</h2>
+                            
+                            <form action="/invest" method="post">
+                                <div class="mb-4">
+                                    <label for="amount" class="form-label">Investment Amount ($)</label>
+                                    <input type="number" class="form-control form-control-lg" id="amount" name="amount" placeholder="Enter amount" min="1000" required>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label">Risk Profile</label>
+                                    <div class="d-flex">
+                                        <div class="form-check form-check-inline flex-grow-1">
+                                            <input class="form-check-input" type="radio" name="risk_profile" id="conservative" value="conservative">
+                                            <label class="form-check-label" for="conservative">Conservative</label>
+                                        </div>
+                                        <div class="form-check form-check-inline flex-grow-1">
+                                            <input class="form-check-input" type="radio" name="risk_profile" id="moderate" value="moderate" checked>
+                                            <label class="form-check-label" for="moderate">Moderate</label>
+                                        </div>
+                                        <div class="form-check form-check-inline flex-grow-1">
+                                            <input class="form-check-input" type="radio" name="risk_profile" id="aggressive" value="aggressive">
+                                            <label class="form-check-label" for="aggressive">Aggressive</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary btn-lg px-5">Generate My Investment Plan</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-5 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h5>Rain</h5>
+                    <p class="text-muted">An AI-powered investment platform demo</p>
+                    <p class="text-muted mb-0">© 2023 Rain. For demonstration purposes only.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create floating elements
+            const floatingElements = document.getElementById('floatingElements');
+            const elementsCount = 20;
+            
+            for (let i = 0; i < elementsCount; i++) {
+                const element = document.createElement('div');
+                element.classList.add('floating-element');
+                
+                // Random size
+                const size = Math.random() * 60 + 10;
+                element.style.width = `${size}px`;
+                element.style.height = `${size}px`;
+                
+                // Random position
+                element.style.left = `${Math.random() * 100}%`;
+                element.style.top = `${Math.random() * 100}%`;
+                
+                // Random opacity
+                element.style.opacity = (Math.random() * 0.08 + 0.02).toString();
+                
+                // Random animation
+                const duration = Math.random() * 20 + 10;
+                const delay = Math.random() * 5;
+                element.style.animation = `scaleIn ${duration}s ease-in-out ${delay}s infinite alternate`;
+                
+                floatingElements.appendChild(element);
+            }
+            
+            // Theme toggle functionality
+            const themeToggle = document.getElementById('themeToggle');
+            const themeText = document.getElementById('themeText');
+            const lightIcon = document.getElementById('lightIcon');
+            const darkIcon = document.getElementById('darkIcon');
+            
+            // Check for saved theme preference or respect OS preference
+            const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const savedTheme = localStorage.getItem('theme');
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDarkMode)) {
+                document.body.classList.add('dark-mode');
+                document.body.classList.remove('auto-dark-mode');
+                themeText.textContent = 'Light Mode';
+                lightIcon.style.display = 'none';
+                darkIcon.style.display = 'block';
+            }
+            
+            // Theme toggle event
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                document.body.classList.remove('auto-dark-mode');
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                
+                // Update button text and icon
+                themeText.textContent = isDarkMode ? 'Light Mode' : 'Dark Mode';
+                lightIcon.style.display = isDarkMode ? 'none' : 'block';
+                darkIcon.style.display = isDarkMode ? 'block' : 'none';
+                
+                // Save preference
+                localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            });
+        });
+    </script>
+</body>
+</html> 
